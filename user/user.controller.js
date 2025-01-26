@@ -6,6 +6,7 @@ import {
   registerUserSchema,
 } from './user.validation.js';
 import UserTable from './user.model.js';
+import validateReqBody from '../middleware/validate.req.body.middleware.js';
 
 const router = express.Router();
 
@@ -15,16 +16,7 @@ const router = express.Router();
 
 router.post(
   '/user/register',
-  async (req, res, next) => {
-    try {
-      const validatedData = await registerUserSchema.validate(req.body);
-
-      req.body = validatedData;
-      next();
-    } catch (error) {
-      return res.status(400).send({ message: error.message });
-    }
-  },
+  validateReqBody(registerUserSchema),
   async (req, res) => {
     // extract new user from req.body
     const newUser = req.body;
@@ -57,16 +49,7 @@ router.post(
 
 router.post(
   '/user/login',
-  async (req, res, next) => {
-    try {
-      const validatedData = await loginCredentialSchema.validate(req.body);
-
-      req.body = validatedData;
-      next();
-    } catch (error) {
-      return res.status(400).send({ message: error.message });
-    }
-  },
+  validateReqBody(loginCredentialSchema),
   async (req, res) => {
     // extract loginCredentials from req.body
     const loginCredentials = req.body;

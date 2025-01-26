@@ -56,8 +56,12 @@ const productSchema = new mongoose.Schema({
     minlength: 10,
     maxlength: 1000,
   },
-  //    TODO: implement seller id
-  //   sellerId: mongoose.ObjectId,
+
+  sellerId: {
+    type: mongoose.ObjectId,
+    ref: 'User',
+    required: true,
+  },
 });
 
 // create table

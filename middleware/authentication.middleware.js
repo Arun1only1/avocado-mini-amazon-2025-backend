@@ -32,6 +32,8 @@ export const isSeller = async (req, res, next) => {
     return res.status(401).send({ message: 'Unauthorized.' });
   }
 
+  req.loggedInUserId = user._id;
+
   next();
 };
 
@@ -66,6 +68,8 @@ export const isBuyer = async (req, res, next) => {
     return res.status(401).send({ message: 'Unauthorized.' });
   }
 
+  req.loggedInUserId = user._id;
+
   next();
 };
 
@@ -95,6 +99,8 @@ export const isUser = async (req, res, next) => {
   if (!user) {
     return res.status(401).send({ message: 'Unauthorized.' });
   }
+
+  req.loggedInUserId = user._id;
 
   next();
 };
