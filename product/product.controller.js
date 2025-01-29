@@ -9,6 +9,7 @@ import ProductTable from './product.model.js';
 import { productSchema } from './product.validation.js';
 import validateReqBody from '../middleware/validate.req.body.middleware.js';
 import { paginationSchema } from '../shared/pagination.schema.js';
+import { isOwnerOfProduct } from './product.middleware.js';
 
 const router = express.Router();
 
@@ -134,12 +135,58 @@ router.get(
   }
 );
 
+// delete product by id
+// point to remember
+// user must be seller
+// req.params.id should be valid mongo id
+// logged in user id must be same as product's seller id
+// if ownership is confirmed, delete product
 router.delete(
   '/product/delete/:id',
   isSeller,
   validateMongoIdFromReqParams,
-  (req, res) => {
-    return res.status(200).send({ message: 'Deleting...' });
+  isOwnerOfProduct,
+  async (req, res) => {
+    // extract product id from req.params
+    const productId = req.params.id;
+
+    // delete product
+    await ProductTable.deleteOne({ _id: productId });
+
+    return res
+      .status(200)
+      .send({ message: 'Product is deleted successfully.' });
   }
 );
+
+// edit product
+router.put(
+  '/product/edit/:id',
+  isSeller,
+  validateMongoIdFromReqParams,
+  isOwnerOfProduct,
+  validateReqBody(productSchema),
+  async (req, res) => {
+    // extract product id from req.params
+    const productId = req.params.id;
+
+    // extract new values from req.body
+    const newValues = req.body;
+
+    // update product
+    await ProductTable.updateOne(
+      { _id: productId },
+      {
+        $set: {
+          ...newValues,
+        },
+      }
+    );
+
+    return res
+      .status(200)
+      .send({ message: 'Product is updated successfully.' });
+  }
+);
+
 export { router as productController };
